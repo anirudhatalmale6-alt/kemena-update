@@ -212,7 +212,7 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity activeOpacity={1} style={styles.menuDrawer}>
             <View style={styles.menuHeader}>
               <TouchableOpacity onPress={() => setShowMenu(false)}>
-                <Ionicons name="close" size={24} color={COLORS.white} />
+                <Ionicons name="close" size={24} color={COLORS.darkGray} />
               </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.menuItem} onPress={() => {
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   menuDrawer: {
     width: '75%',
     height: '100%',
-    backgroundColor: '#1a5276',
+    backgroundColor: COLORS.white,
   },
   menuHeader: {
     paddingTop: 50,
@@ -315,16 +315,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(255,255,255,0.2)',
+    borderBottomColor: COLORS.border,
   },
   menuItemText: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.darkGray,
   },
   menuSubText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
+    color: COLORS.textSecondary,
     paddingLeft: 16,
   },
   listContent: {
