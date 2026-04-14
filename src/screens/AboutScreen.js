@@ -3,6 +3,7 @@ import {
   View,
   Text,
   ScrollView,
+  Image,
   TouchableOpacity,
   StyleSheet,
   Linking,
@@ -22,10 +23,11 @@ const AboutScreen = ({ navigation }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>KEMENA</Text>
-          <Text style={styles.logoText}>UPDATE</Text>
-        </View>
+        <Image
+          source={require('../../assets/logo_n69.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
         <Text style={styles.appName}>Kemena Update</Text>
         <Text style={styles.tagline}>
           Suara Raban Iban, Berita Kitai
@@ -91,20 +93,10 @@ const styles = StyleSheet.create({
     padding: SIZES.paddingLarge,
     alignItems: 'center',
   },
-  logoContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+  logo: {
+    width: 150,
+    height: 150,
     marginBottom: 16,
-  },
-  logoText: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: COLORS.white,
-    letterSpacing: 2,
   },
   appName: {
     fontSize: 22,
