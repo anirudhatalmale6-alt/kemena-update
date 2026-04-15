@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -15,6 +15,7 @@ import SearchScreen from './src/screens/SearchScreen';
 import CategoriesScreen from './src/screens/CategoriesScreen';
 import BookmarksScreen from './src/screens/BookmarksScreen';
 import AboutScreen from './src/screens/AboutScreen';
+import SplashOverlay from './src/components/SplashOverlay';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -59,6 +60,7 @@ export default function App() {
   const navigationRef = useRef(null);
   const notificationListener = useRef(null);
   const responseListener = useRef(null);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     registerForPushNotifications();
@@ -106,6 +108,7 @@ export default function App() {
           options={{ animation: 'slide_from_right' }}
         />
       </Stack.Navigator>
+      {showSplash && <SplashOverlay onFinish={() => setShowSplash(false)} />}
     </NavigationContainer>
   );
 }
