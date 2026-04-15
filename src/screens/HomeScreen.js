@@ -6,7 +6,9 @@ import {
   RefreshControl,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   Image,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -203,13 +205,17 @@ const HomeScreen = ({ navigation }) => {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
 
-      {showMenu && (
-        <TouchableOpacity
+      <Modal
+        visible={showMenu}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowMenu(false)}
+      >
+        <Pressable
           style={styles.menuOverlay}
-          activeOpacity={1}
           onPress={() => setShowMenu(false)}
         >
-          <TouchableOpacity activeOpacity={1} style={styles.menuDrawer}>
+          <Pressable style={styles.menuDrawer} onPress={() => {}}>
             <View style={styles.menuHeader}>
               <TouchableOpacity onPress={() => setShowMenu(false)}>
                 <Ionicons name="close" size={24} color={COLORS.darkGray} />
@@ -228,12 +234,24 @@ const HomeScreen = ({ navigation }) => {
             }}>
               <Text style={styles.menuItemText}>ABOUT US</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={() => {
+              setShowMenu(false);
+              navigation.navigate('Bookmarks');
+            }}>
+              <Text style={styles.menuItemText}>BOOKMARKS</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={() => {
+              setShowMenu(false);
+              navigation.navigate('Categories');
+            }}>
+              <Text style={styles.menuItemText}>CATEGORIES</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem}>
               <Text style={styles.menuSubText}>Privacy Policy</Text>
             </TouchableOpacity>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      )}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -290,13 +308,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   menuOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
-    zIndex: 100,
   },
   menuDrawer: {
     width: '75%',
