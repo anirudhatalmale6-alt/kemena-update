@@ -40,9 +40,42 @@ export const registerForPushNotifications = async () => {
   }
 
   try {
-    const fcmToken = await Notifications.getDevicePushTokenAsync();
-    console.log('FCM token:', fcmToken.data);
-    return fcmToken.data;
+    const deviceToken = await Notifications.getDevicePushTokenAsync();
+    console.log('FCM token:', deviceToken.data);
+
+    // Subscribe to 'news' topic for auto notifications
+    try {
+      await fetch(
+        `https://iid.googleapis.com/iid/v1/${deviceToken.data}/rel/topics/news`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: 'key=AIzaSyAwj95JQNLJtoe3MZd4iegASYjSvXXY-dU',
+          },
+        }
+      );
+      console.log('Subscribed to news topic');
+    } catch (topicErr) {
+      console.log('Topic subscription error:', topicErr);
+    }
+
+    // Also subscribe to 'all' topic
+    try {
+      await fetch(
+        `https://iid.googleapis.com/iid/v1/${deviceToken.data}/rel/topics/all`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: 'key=AIzaSyAwj95JQNLJtoe3MZd4iegASYjSvXXY-dU',
+          },
+        }
+      );
+      console.log('Subscribed to all topic');
+    } catch (topicErr) {
+      console.log('Topic subscription error:', topicErr);
+    }
+
+    return deviceToken.data;
   } catch (error) {
     console.log('Error getting push token:', error);
     return null;
