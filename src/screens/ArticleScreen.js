@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,13 @@ import {
   StyleSheet,
   Share,
   useWindowDimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import RenderHtml from 'react-native-render-html';
 import AdBanner from '../components/AdBanner';
 import { COLORS, SIZES } from '../constants/theme';
+import { translateText, translatePlainText } from '../services/translate';
 
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
@@ -25,6 +27,11 @@ const ArticleScreen = ({ route, navigation }) => {
   const { article } = route.params;
   const { width } = useWindowDimensions();
   const contentWidth = width - SIZES.padding * 2;
+
+  const [isTranslated, setIsTranslated] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translatedTitle, setTranslatedTitle] = useState('');
+  const [translatedContent, setTranslatedContent] = useState('');
 
   const tagsStyles = {
     body: {
@@ -69,6 +76,36 @@ const ArticleScreen = ({ route, navigation }) => {
     }
   };
 
+  const handleTranslate = async () => {
+    if (isTranslated) {
+      setIsTranslated(false);
+      return;
+    }
+
+    if (translatedTitle && translatedContent) {
+      setIsTranslated(true);
+      return;
+    }
+
+    setTranslating(true);
+    try {
+      const [tTitle, tContent] = await Promise.all([
+        translatePlainText(article.title, 'en', 'ms'),
+        translateText(article.content, 'en', 'ms'),
+      ]);
+      setTranslatedTitle(tTitle);
+      setTranslatedContent(tContent);
+      setIsTranslated(true);
+    } catch (err) {
+      console.error('Translation failed:', err);
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+  const displayTitle = isTranslated ? translatedTitle : article.title;
+  const displayContent = isTranslated ? translatedContent : article.content;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -91,24 +128,47 @@ const ArticleScreen = ({ route, navigation }) => {
         )}
 
         <View style={styles.articleContent}>
-          <Text style={styles.title}>{article.title}</Text>
+          <Text style={styles.title}>{displayTitle}</Text>
 
-          <View style={styles.metaContainer}>
-            <View style={styles.metaItem}>
-              <Ionicons name="calendar-outline" size={14} color={COLORS.textSecondary} />
-              <Text style={styles.metaText}>{formatDate(article.date)}</Text>
+          <View style={styles.metaRow}>
+            <View style={styles.metaContainer}>
+              <View style={styles.metaItem}>
+                <Ionicons name="calendar-outline" size={14} color={COLORS.textSecondary} />
+                <Text style={styles.metaText}>{formatDate(article.date)}</Text>
+              </View>
+              <View style={styles.metaItem}>
+                <Ionicons name="person-outline" size={14} color={COLORS.textSecondary} />
+                <Text style={styles.metaText}>{article.author}</Text>
+              </View>
             </View>
-            <View style={styles.metaItem}>
-              <Ionicons name="person-outline" size={14} color={COLORS.textSecondary} />
-              <Text style={styles.metaText}>{article.author}</Text>
-            </View>
+
+            <TouchableOpacity
+              style={[styles.translateBtn, isTranslated && styles.translateBtnActive]}
+              onPress={handleTranslate}
+              disabled={translating}
+            >
+              {translating ? (
+                <ActivityIndicator size="small" color={COLORS.white} />
+              ) : (
+                <>
+                  <Ionicons
+                    name="language"
+                    size={16}
+                    color={isTranslated ? COLORS.white : COLORS.primary}
+                  />
+                  <Text style={[styles.translateText, isTranslated && styles.translateTextActive]}>
+                    {isTranslated ? 'BM' : 'EN'}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
           </View>
 
           <View style={styles.divider} />
 
           <RenderHtml
             contentWidth={contentWidth}
-            source={{ html: article.content }}
+            source={{ html: displayContent }}
             tagsStyles={tagsStyles}
             enableExperimentalMarginCollapsing={true}
           />
@@ -173,9 +233,15 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     marginBottom: 12,
   },
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   metaContainer: {
     flexDirection: 'row',
-    marginBottom: 16,
+    flex: 1,
   },
   metaItem: {
     flexDirection: 'row',
@@ -186,6 +252,28 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
     marginLeft: 4,
+  },
+  translateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+    gap: 4,
+  },
+  translateBtnActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  translateText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  translateTextActive: {
+    color: COLORS.white,
   },
   divider: {
     height: 1,
